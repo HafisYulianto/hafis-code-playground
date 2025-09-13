@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Hafis Code Playground - Interactive Code Editor</title>
+    <meta name="description" content="Modern interactive code playground for HTML, CSS, and JavaScript with live preview">
+    <meta name="keywords" content="code editor, playground, HTML, CSS, JavaScript, live preview, Hafis Yulianto">
+    <meta name="author" content="Hafis Yulianto">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hafisyulianto.github.io/hafis-code-playground/">
+    <meta property="og:title" content="Hafis Code Playground">
+    <meta property="og:description" content="Interactive code playground with live preview">
+    <meta property="og:image" content="https://hafisyulianto.github.io/hafis-code-playground/preview.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://hafisyulianto.github.io/hafis-code-playground/">
+    <meta property="twitter:title" content="Hafis Code Playground">
+    <meta property="twitter:description" content="Interactive code playground with live preview">
+    <meta property="twitter:image" content="https://hafisyulianto.github.io/hafis-code-playground/preview.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Monaco Editor -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- Google Fonts - Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'code': ['Fira Code', 'Monaco', 'Cascadia Code', 'Roboto Mono', 'monospace']
+                    },
+                    colors: {
+                        'primary': {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    },
+                    animation: {
+                        'slide-in': 'slideIn 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.2s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        slideIn: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-slate-900 transition-all duration-300 font-sans">
+    
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white dark:bg-slate-900 z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="text-6xl mb-4 animate-pulse-slow">🚀</div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Hafis Code Playground</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">Loading Monaco Editor...</p>
+            <div class="flex space-x-1">
+                <div class="w-2 h-2 bg-primary-500 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-primary-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-700 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl animate-pulse-slow">🚀</div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">
+                            Hafis Code Playground
+                        </h1>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
+                            Made with ❤️ by <span class="font-semibold text-primary-600 dark:text-primary-400">Hafis Yulianto</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Main Controls -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+                    
+                    <!-- Template Selector -->
+                    <div class="relative">
+                        <select id="templateSelect" 
+                                class="pl-3 pr-8 py-2 bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all">
+                            <option value="">Select Template</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"></i>
+                    </div>
+                    
+                    <!-- Live Preview Toggle -->
+                    <button id="livePreviewToggle" 
+                            class="hidden sm:flex items-center space-x-1 px-3 py-2 bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-lg transition-all text-sm">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                        <span class="hidden md:inline">Live</span>
+                    </button>
+                    
+                    <!-- Theme Toggle -->
+                    <button id="themeToggle" 
+                            class="p-2 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all">
+                        <i data-lucide="sun" class="w-5 h-5 dark:hidden"></i>
+                        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+                    </button>
+                    
+                    <!-- Run Button -->
+                    <button id="runBtn" 
+                            class="flex items-center space-x-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        <i data-lucide="play" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Run</span>
+                    </button>
+                    
+                    <!-- More Menu -->
+                    <div class="relative">
+                        <button id="moreBtn" 
+                                class="p-2 rounded-lg bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all">
+                            <i data-lucide="more-horizontal" class="w-5 h-5"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="moreMenu" 
+                             class="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 hidden z-50 animate-slide-in">
+                            <div class="py-2">
+                                <button id="saveBtn" class="dropdown-item">
+                                    <i data-lucide="save" class="w-4 h-4"></i>
+                                    <span>Save Project</span>
+                                    <kbd class="kbd">Ctrl+S</kbd>
+                                </button>
+                                <button id="exportBtn" class="dropdown-item">
+                                    <i data-lucide="download" class="w-4 h-4"></i>
+                                    <span>Export as ZIP</span>
+                                </button>
+                                <button id="importBtn" class="dropdown-item">
+                                    <i data-lucide="upload" class="w-4 h-4"></i>
+                                    <span>Import Project</span>
+                                </button>
+                                <hr class="my-2 border-gray-200 dark:border-slate-700">
+                                <button id="shareBtn" class="dropdown-item">
+                                    <i data-lucide="share" class="w-4 h-4"></i>
+                                    <span>Share Link</span>
+                                </button>
+                                <button id="historyBtn" class="dropdown-item">
+                                    <i data-lucide="history" class="w-4 h-4"></i>
+                                    <span>Version History</span>
+                                </button>
+                                <hr class="my-2 border-gray-200 dark:border-slate-700">
+                                <button id="settingsBtn" class="dropdown-item">
+                                    <i data-lucide="settings" class="w-4 h-4"></i>
+                                    <span>Settings</span>
+                                </button>
+                                <button id="clearBtn" class="dropdown-item text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    <span>Clear Project</span>
+                                    <kbd class="kbd">Ctrl+⇧+C</kbd>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 h-[calc(100vh-12rem)]">
+            
+            <!-- Sidebar - Code Snippets & Tools -->
+            <aside class="xl:col-span-2 space-y-6">
+                
+                <!-- Code Snippets Panel -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden h-full">
+                    <div class="p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold text-gray-900 dark:text-white flex items-center">
+                                <i data-lucide="code-2" class="w-4 h-4 mr-2"></i>
+                                Snippets
+                            </h3>
+                            <button id="refreshSnippets" class="p-1 hover:bg-gray-200 dark:hover:bg-slate-700 rounded">
+                                <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-500"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Snippet Categories -->
+                    <div class="p-2">
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <button class="snippet-category-btn active" data-category="all">All</button>
+                            <button class="snippet-category-btn" data-category="html">HTML</button>
+                            <button class="snippet-category-btn" data-category="css">CSS</button>
+                            <button class="snippet-category-btn" data-category="js">JS</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Snippets List -->
+                    <div class="px-2 pb-2 space-y-1 max-h-80 overflow-y-auto" id="snippetsList">
+                        <!-- Snippets will be populated by JavaScript -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Editor Section -->
+            <section class="xl:col-span-5 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
+                
+                <!-- File Tabs -->
+                <div class="flex border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900">
+                    <button class="file-tab active" data-file="html">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <span>index.html</span>
+                        <div class="file-indicator"></div>
+                    </button>
+                    <button class="file-tab" data-file="css">
+                        <i data-lucide="palette" class="w-4 h-4"></i>
+                        <span>style.css</span>
+                        <div class="file-indicator"></div>
+                    </button>
+                    <button class="file-tab" data-file="js">
+                        <i data-lucide="code" class="w-4 h-4"></i>
+                        <span>script.js</span>
+                        <div class="file-indicator"></div>
+                    </button>
+                    
+                    <!-- Editor Actions -->
+                    <div class="ml-auto flex items-center px-3 space-x-2">
+                        <button id="formatBtn" class="editor-action-btn" title="Format Code (Ctrl+Shift+F)">
+                            <i data-lucide="align-left" class="w-4 h-4"></i>
+                        </button>
+                        <button id="findBtn" class="editor-action-btn" title="Find (Ctrl+F)">
+                            <i data-lucide="search" class="w-4 h-4"></i>
+                        </button>
+                        <button id="wordWrapBtn" class="editor-action-btn" title="Toggle Word Wrap">
+                            <i data-lucide="wrap-text" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Monaco Editor Container -->
+                <div id="editorContainer" class="h-full font-code"></div>
+                
+                <!-- Editor Status Bar -->
+                <div class="px-4 py-2 bg-gray-50 dark:bg-slate-900 border-t border-gray-200 dark:border-slate-700 text-xs text-gray-500 dark:text-gray-400 flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <span id="cursorPosition">Ln 1, Col 1</span>
+                        <span id="selectionInfo"></span>
+                        <span id="languageInfo">HTML</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="encodingInfo">UTF-8</span>
+                        <span id="eolInfo">LF</span>
+                        <button id="fontSizeBtn" class="hover:text-gray-700 dark:hover:text-gray-300">14px</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Preview Section -->
+            <section class="xl:col-span-5 flex flex-col bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden">
+                
+                <!-- Preview Header -->
+                <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900">
+                    <div class="flex items-center space-x-3">
+                        <h3 class="font-semibold text-gray-900 dark:text-white flex items-center">
+                            <i data-lucide="monitor" class="w-4 h-4 mr-2"></i>
+                            Preview
+                        </h3>
+                        <div class="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="w-2 h-2 rounded-full bg-green-500" id="previewStatus"></div>
+                            <span id="previewStatusText">Ready</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2">
+                        <!-- Device Responsive Toggle -->
+                        <div class="flex bg-gray-200 dark:bg-slate-700 rounded-lg p-1">
+                            <button class="device-btn active" data-device="desktop" title="Desktop View">
+                                <i data-lucide="monitor" class="w-4 h-4"></i>
+                            </button>
+                            <button class="device-btn" data-device="tablet" title="Tablet View">
+                                <i data-lucide="tablet" class="w-4 h-4"></i>
+                            </button>
+                            <button class="device-btn" data-device="mobile" title="Mobile View">
+                                <i data-lucide="smartphone" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Preview Actions -->
+                        <button id="refreshPreview" class="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition-all" title="Refresh Preview">
+                            <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-600 dark:text-gray-300"></i>
+                        </button>
+                        
+                        <button id="openInNewTab" class="p-2 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-lg transition-all" title="Open in New Tab">
+                            <i data-lucide="external-link" class="w-4 h-4 text-gray-600 dark:text-gray-300"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Preview Frame Container -->
+                <div class="flex-1 bg-white dark:bg-slate-900 relative overflow-hidden">
+                    <div id="previewWrapper" class="preview-desktop w-full h-full">
+                        <iframe id="previewFrame" 
+                                class="w-full h-full border-0" 
+                                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                                title="Code Preview"></iframe>
+                    </div>
+                    
+                    <!-- Preview Loading Overlay -->
+                    <div id="previewLoading" class="absolute inset-0 bg-white dark:bg-slate-900 flex items-center justify-center hidden">
+                        <div class="text-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-2"></div>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Updating preview...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Console Panel -->
+                <div class="h-32 border-t border-gray-200 dark:border-slate-700">
+                    <div class="flex justify-between items-center px-4 py-2 bg-gray-50 dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700">
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center">
+                            <i data-lucide="terminal" class="w-4 h-4 mr-2"></i>
+                            Console
+                            <span id="consoleCount" class="ml-2 px-2 py-0.5 bg-gray-200 dark:bg-slate-700 text-xs rounded-full">0</span>
+                        </h4>
+                        <div class="flex items-center space-x-2">
+                            <button id="consoleFilter" class="text-xs px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded hover:bg-gray-300 dark:hover:bg-slate-600">
+                                All
+                            </button>
+                            <button id="clearConsole" class="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    <div id="consoleOutput" class="h-24 overflow-y-auto p-2 font-code text-xs bg-gray-900 text-green-400">
+                        <div class="text-gray-500 flex items-center">
+                            <i data-lucide="info" class="w-3 h-3 mr-2"></i>
+                            Console output will appear here...
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                <div class="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
+                    <p>© 2025 <strong>Hafis Code Playground</strong>. Built with ❤️ for developers worldwide.</p>
+                    <p class="mt-1">Powered by Monaco Editor, TailwindCSS & Modern Web Technologies</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/hafisyulianto" target="_blank" rel="noopener noreferrer" 
+                       class="social-link">
+                        <i data-lucide="github" class="w-5 h-5"></i>
+                        <span class="sr-only">GitHub</span>
+                    </a>
+                    <a href="https://linkedin.com/in/hafisyulianto" target="_blank" rel="noopener noreferrer" 
+                       class="social-link">
+                        <i data-lucide="linkedin" class="w-5 h-5"></i>
+                        <span class="sr-only">LinkedIn</span>
+                    </a>
+                    <a href="https://twitter.com/hafisyulianto" target="_blank" rel="noopener noreferrer" 
+                       class="social-link">
+                        <i data-lucide="twitter" class="w-5 h-5"></i>
+                        <span class="sr-only">Twitter</span>
+                    </a>
+                    <button id="followBtn" 
+                            class="px-4 py-2 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white text-sm font-medium rounded-lg transition-all transform hover:scale-105 shadow-md hover:shadow-lg">
+                        <i data-lucide="heart" class="w-4 h-4 inline mr-2"></i>
+                        Follow Me
+                    </button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Hidden Elements -->
+    
+    <!-- File Input for Import -->
+    <input type="file" id="importInput" accept=".zip,.html,.css,.js" class="hidden" multiple>
+    
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-slate-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Share Your Project</h3>
+                <button id="closeShareModal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Share your project with others using this link:</p>
+                <div class="flex space-x-2">
+                    <input type="text" id="shareLink" readonly 
+                           class="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-gray-50 dark:bg-slate-700 text-sm">
+                    <button id="copyShareLink" 
+                            class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm font-medium">
+                        Copy
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Anyone with this link can view and edit your project.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal-overlay hidden">
+        <div class="modal-content max-w-md">
+            <div class="flex justify-between items-center p-6 border-b border-gray-200 dark:border-slate-700">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Settings</h3>
+                <button id="closeSettingsModal" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <!-- Settings content will be added by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- PWA App Install Banner -->
+    <div id="installBanner" class="fixed bottom-4 left-4 right-4 bg-primary-600 text-white p-4 rounded-lg shadow-lg hidden z-40">
+        <div class="flex items-center justify-between">
+            <div>
+                <h4 class="font-medium">Install Hafis Code Playground</h4>
+                <p class="text-sm opacity-90">Get the full app experience!</p>
+            </div>
+            <div class="flex space-x-2">
+                <button id="installApp" class="px-4 py-2 bg-white text-primary-600 rounded font-medium">Install</button>
+                <button id="dismissInstall" class="p-2 text-white hover:bg-primary-700 rounded">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="storage.js"></script>
+    <script src="templates.js"></script>
+    <script src="editor.js"></script>
+    <script src="script.js"></script>
+    
+    <!-- Initialize App -->
+    <script>
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize icons
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+            
+            console.log('🚀 Hafis Code Playground loading...');
+        });
+        
+        // Handle app installation
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').classList.remove('hidden');
+        });
+        
+        document.getElementById('installApp').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`PWA install prompt outcome: ${outcome}`);
+                deferredPrompt = null;
+                document.getElementById('installBanner').classList.add('hidden');
+            }
+        });
+        
+        document.getElementById('dismissInstall').addEventListener('click', () => {
+            document.getElementById('installBanner').classList.add('hidden');
+        });
+    </script>
+</body>
+</html>
